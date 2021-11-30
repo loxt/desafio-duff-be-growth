@@ -1,51 +1,57 @@
-import {
-  BeforeCreate,
-  BeforeUpdate,
-  Column,
-  DataType,
-  HasOne,
-  Model,
-  PrimaryKey,
-  Table,
-} from 'sequelize-typescript';
 import { BeerStyle } from '../types/beer.type';
 import { Playlist } from './playlist.entity';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Table({
-  tableName: 'beers',
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
+@Entity({
+  name: 'beers',
 })
-export class Beer extends Model {
-  @PrimaryKey
-  @Column({
-    allowNull: false,
-    defaultValue: DataType.UUIDV4,
-    type: DataType.UUID,
-  })
+export class Beer {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   name: string;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   minimum_temperature: number;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   maximum_temperature: number;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   average_temperature: number;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   style: BeerStyle;
 
-  @HasOne(() => Playlist)
+  @OneToOne(() => Playlist)
   playlist: Playlist;
 
-  @BeforeCreate
-  @BeforeUpdate
-  static beforeCreateBeer(beer, options, cb) {
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+  })
+  created_at: Date;
+
+  @UpdateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
+    onUpdate: 'CURRENT_TIMESTAMP(6)',
+  })
+  updated_at: Date;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  beforeCreate(beer) {
     console.log('fds');
     beer.average_temperature =
       (beer.maximum_temperature + beer.minimum_temperature) / 2;

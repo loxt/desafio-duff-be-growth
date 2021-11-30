@@ -1,17 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { Beer } from './entities/beer.entity';
-import { Sequelize } from 'sequelize-typescript';
 import { CreateBeerDto } from './dto/create-beer.dto';
 import { BeerStyle } from './types/beer.type';
-import { Playlist } from './entities/playlist.entity';
-import { Track } from './entities/track.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class BeerService {
   constructor(
-    @InjectModel(Beer) private readonly beerModel: typeof Beer,
-    private readonly sequelize: Sequelize,
+    @InjectRepository(Beer) private readonly beerRepository: Repository<Beer>,
   ) {}
 
   logger: Logger = new Logger('BeerService');
@@ -26,31 +23,23 @@ export class BeerService {
         link: 'http',
       },
     };
-    const tst = await this.beerModel.create(beer, {
-      include: [
-        {
-          all: true,
-        },
-      ],
-    });
-    console.log(beer);
-    console.debug(tst);
+    const tst = await this.beerRepository.create(beer);
+
+    console.log('foi');
+    console.log(tst);
     return 'oi';
   }
 
   findAll() {
-    return this.beerModel.findAll();
+    return this.beerRepository.find();
   }
 
   findOne(id: string) {
-    console.log(id);
-    return this.beerModel.findByPk(id, {
-      include: [Playlist, Track],
-    });
+    return this.beerRepository.findOneOrFail(id);
   }
 
   async findByTemperature(temperature: number) {
-    const [beers] = await this.sequelize.query(
+    const [beers] = await this.beerRepository.query(
       `SELECT *
        from beers
        order by abs(average_temperature - ${temperature}), style ASC`,

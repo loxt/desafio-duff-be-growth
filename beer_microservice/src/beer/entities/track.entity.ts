@@ -1,41 +1,22 @@
-import {
-  BelongsTo,
-  Column,
-  DataType,
-  ForeignKey,
-  Model,
-  PrimaryKey,
-  Table,
-} from 'sequelize-typescript';
-import { Beer } from './beer.entity';
 import { Playlist } from './playlist.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Table({
-  tableName: 'tracks',
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
+@Entity({
+  name: 'tracks',
 })
-export class Track extends Model {
-  @PrimaryKey
-  @Column({
-    allowNull: false,
-    defaultValue: DataType.UUIDV4,
-    type: DataType.UUID,
-  })
+export class Track {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   name: string;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   link: string;
 
-  @Column({ allowNull: false })
+  @Column({ nullable: false })
   artist: string;
 
-  @BelongsTo(() => Beer, 'playlistId')
-  beer: Beer;
-
-  @ForeignKey(() => Playlist)
+  @ManyToOne(() => Playlist)
   playlist: Playlist;
 }
