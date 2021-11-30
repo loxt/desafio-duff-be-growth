@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  backend:
+    build: ./backend
+    entrypoint: ./.docker/entrypoint.sh
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/home/node/app
+    depends_on:
+      - beer_microservice
+    networks:
+      - backend
+  beer_microservice:
+    build: ./beer_microservice
+    hostname: beer_microservice
+    entrypoint: dockerize -wait tcp://duff_database:3306 -timeout 40s ./.docker/entrypoint.sh
+    volumes:
+      - ./beer_microservice:/home/node/app
+    depends_on:
+      - database
+    networks:
+      - backend
+    ports:
+      - "8081:8081"
+  database:
+    build: ./.docker/mysql
+    restart: always
+    hostname: duff_database
+    tty: true
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./.docker/dbdata:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=beer
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - backend
+networks:
+  backend:
+    driver: bridge
