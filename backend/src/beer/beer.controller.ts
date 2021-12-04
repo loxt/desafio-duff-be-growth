@@ -3,7 +3,7 @@ import {
   Controller,
   Delete,
   Get,
-  Logger,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -14,9 +14,8 @@ import { BeerService } from './beer.service';
 export class BeerController {
   constructor(private readonly beerService: BeerService) {}
 
-  private readonly logger: Logger = new Logger('BeerController');
-
   @Post()
+  @HttpCode(204)
   async create(@Body() createBeerDto: any) {
     return this.beerService.create(createBeerDto);
   }
@@ -26,14 +25,14 @@ export class BeerController {
     return this.beerService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.beerService.findOne(id);
-  }
-
   @Get('temperature')
   async findByTemperature(@Body('temperature') temperature: number) {
     return this.beerService.findByTemperature(+temperature);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.beerService.findOne(id);
   }
 
   @Patch(':id')

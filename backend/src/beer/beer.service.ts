@@ -4,6 +4,7 @@ import {
   ClientProxyFactory,
   Transport,
 } from '@nestjs/microservices';
+import { catchError, of } from 'rxjs';
 
 @Injectable()
 export class BeerService {
@@ -13,8 +14,8 @@ export class BeerService {
     this.microserviceClient = ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
-        host: 'beer_microservice',
-        port: 8081,
+        host: process.env.BEER_MICROSERVICE_HOST,
+        port: +process.env.BEER_MICROSERVICE_PORT,
       },
     });
   }
@@ -34,12 +35,12 @@ export class BeerService {
   }
 
   findByTemperature(temperature: number) {
-    console.log(temperature);
     if (temperature === null) {
       throw new HttpException('Temperature field is not defined', 400);
     }
-    console.log('essa é a temp', temperature);
-    return this.microserviceClient.send('findByTemperature', temperature);
+    return this.microserviceClient
+      .send('findByTemperature', temperature)
+      .pipe(catchError((error) => of(error)));
   }
 
   update(id: number, updateBeerDto: any) {

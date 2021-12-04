@@ -11,3 +11,6 @@ export class seedBeers1638326160238 implements MigrationInterface {
     await queryRunner.dropTable('beers');
   }
 }
+
+// TODO: add swagger
+// TODO: search by temperature (if average_temperature is equal, order alphabetically)), else if, return the first index.
