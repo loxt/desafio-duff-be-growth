@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Beer } from './entities/beer.entity';
 import { CreateBeerDto } from './dto/create-beer.dto';
-import { BeerStyle } from './types/beer.type';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RpcException } from '@nestjs/microservices';
+import { validateOrReject } from 'class-validator';
 
 @Injectable()
 export class BeerService {
@@ -15,18 +15,11 @@ export class BeerService {
   logger: Logger = new Logger('BeerService');
 
   async create(createBeerDto: CreateBeerDto) {
-    const beer = {
-      ...createBeerDto,
-      style: BeerStyle.DUNKEL,
-      average_temperature: 0,
-      playlist: {
-        name: 'teste',
-        link: 'http',
-      },
-    };
-    const tst = await this.beerRepository.create(beer);
+    const beer = new Beer();
+    Object.assign(beer, createBeerDto);
 
-    return 'oi';
+    await validateOrReject(beer);
+    return this.beerRepository.save(beer);
   }
 
   findAll() {

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { RpcExceptionFilter } from './common/filters/rpc-exception.filter';
 
 async function bootstrap() {
   const logger: Logger = new Logger('Microservice');
@@ -15,12 +16,13 @@ async function bootstrap() {
       },
     },
   );
-
+  app.useGlobalFilters(new RpcExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
-      errorHttpStatusCode: 422,
+      transform: true,
     }),
   );
+
   app.listen().then(() => {
     logger.log('Listening on port 8081');
   });

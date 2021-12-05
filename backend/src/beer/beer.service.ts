@@ -21,20 +21,22 @@ export class BeerService {
   }
 
   async create(createBeerDto: any = {}) {
-    return this.microserviceClient.send('create', createBeerDto);
+    return this.microserviceClient
+      .send('create', createBeerDto)
+      .pipe(catchError((error) => of(error)));
   }
 
-  findAll() {
+  async findAll() {
     return this.microserviceClient.send('findAll', []);
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.microserviceClient.send('findOne', {
       id,
     });
   }
 
-  findByTemperature(temperature: number) {
+  async findByTemperature(temperature: number) {
     if (temperature === null) {
       throw new HttpException('Temperature field is not defined', 400);
     }

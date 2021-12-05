@@ -51,9 +51,8 @@ export class Beer {
 
   @BeforeInsert()
   @BeforeUpdate()
-  beforeCreate(beer) {
-    console.log('fds');
-    beer.average_temperature =
-      (beer.maximum_temperature + beer.minimum_temperature) / 2;
+  async beforeCreate() {
+    this.average_temperature =
+      (this.maximum_temperature + this.minimum_temperature) / 2;
   }
 }

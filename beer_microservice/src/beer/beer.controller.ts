@@ -1,13 +1,14 @@
-import { Body, Controller } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { BeerService } from './beer.service';
 import { MessagePattern } from '@nestjs/microservices';
+import { CreateBeerDto } from './dto/create-beer.dto';
 
 @Controller('beers')
 export class BeerController {
   constructor(private readonly beerService: BeerService) {}
 
   @MessagePattern('create')
-  create(@Body() createBeerDto) {
+  async create(createBeerDto: CreateBeerDto) {
     return this.beerService.create(createBeerDto);
   }
 
@@ -17,12 +18,12 @@ export class BeerController {
   }
 
   @MessagePattern('findOne')
-  findOne(@Body('id') id: string) {
+  findOne({ id }) {
     return this.beerService.findOne(id);
   }
 
   @MessagePattern('findByTemperature')
-  findByTemperature(@Body() temperature: number) {
+  findByTemperature(temperature) {
     return this.beerService.findByTemperature(temperature);
   }
 

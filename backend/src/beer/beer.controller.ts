@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Param,
   Patch,
   Post,
@@ -15,7 +14,6 @@ export class BeerController {
   constructor(private readonly beerService: BeerService) {}
 
   @Post()
-  @HttpCode(204)
   async create(@Body() createBeerDto: any) {
     return this.beerService.create(createBeerDto);
   }
