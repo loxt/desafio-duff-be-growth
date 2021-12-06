@@ -11,6 +11,8 @@ export class Playlist {
   @Column({ nullable: false })
   name: string;
 
-  @OneToMany(() => Track, (trackEntity) => trackEntity.playlist)
+  @OneToMany(() => Track, (trackEntity) => trackEntity.playlist, {
+    cascade: true,
+  })
   tracks: [Track];
 }

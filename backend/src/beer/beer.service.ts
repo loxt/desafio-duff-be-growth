@@ -5,12 +5,14 @@ import {
   Transport,
 } from '@nestjs/microservices';
 import { catchError, of } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
+import * as querystring from 'querystring';
 
 @Injectable()
 export class BeerService {
   private microserviceClient: ClientProxy;
 
-  constructor() {
+  constructor(private readonly httpService: HttpService) {
     this.microserviceClient = ClientProxyFactory.create({
       transport: Transport.TCP,
       options: {
@@ -21,9 +23,25 @@ export class BeerService {
   }
 
   async create(createBeerDto: any = {}) {
-    return this.microserviceClient
-      .send('create', createBeerDto)
-      .pipe(catchError((error) => of(error)));
+    this.httpService
+      .post(
+        'https://accounts.spotify.com/api/token',
+        querystring.stringify({ grant_type: 'client_credentials' }),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          auth: {
+            username: process.env.SPOTIFY_CLIENT_ID,
+            password: process.env.SPOTIFY_CLIENT_SECRET,
+          },
+        },
+      )
+      .subscribe((c) => console.log(c));
+    return 'ok';
+    // return this.microserviceClient
+    //   .send('create', createBeerDto)
+    //   .pipe(catchError((error) => of(error)));
   }
 
   async findAll() {
@@ -41,7 +59,7 @@ export class BeerService {
       throw new HttpException('Temperature field is not defined', 400);
     }
     return this.microserviceClient
-      .send('findByTemperature', temperature)
+      .send('findByTemperature', { temperature })
       .pipe(catchError((error) => of(error)));
   }
 

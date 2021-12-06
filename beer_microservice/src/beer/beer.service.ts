@@ -1,10 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Beer } from './entities/beer.entity';
-import { CreateBeerDto } from './dto/create-beer.dto';
+import { CreateBeerDTO } from './dto/create-beer.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RpcException } from '@nestjs/microservices';
-import { validateOrReject } from 'class-validator';
+import { FindByTemperatureDTO } from './dto/find-by-temperature.dto';
 
 @Injectable()
 export class BeerService {
@@ -14,40 +13,35 @@ export class BeerService {
 
   logger: Logger = new Logger('BeerService');
 
-  async create(createBeerDto: CreateBeerDto) {
+  async create(createBeerDTO: CreateBeerDTO) {
     const beer = new Beer();
-    Object.assign(beer, createBeerDto);
+    Object.assign(beer, createBeerDTO);
 
-    await validateOrReject(beer);
     return this.beerRepository.save(beer);
   }
 
   findAll() {
-    return this.beerRepository.find();
+    return this.beerRepository.find({
+      relations: ['playlist', 'playlist.tracks'],
+    });
   }
 
   findOne(id: string) {
     return this.beerRepository.findOneOrFail(id);
   }
 
-  async findByTemperature(temperature: number) {
-    if (temperature === null) {
-      throw new RpcException({
-        statusCode: 400,
-        error: 'Temperature field is not defined',
-      });
-    }
+  async findByTemperature(findByTemperatureDTO: FindByTemperatureDTO) {
     const beers = await this.beerRepository.query(
       `SELECT *
        from beers
-       order by abs(average_temperature - ${temperature}), style ASC`,
+       order by abs(average_temperature - ${findByTemperatureDTO.temperature}), style ASC`,
     );
 
     this.logger.log(`Found ${beers.length} beers for the closest value of 36`);
 
     return beers.filter(
       (beer) =>
-        beer.name[0] === beers[0].name[0] &&
+        beer.style[0] === beers[0].style[0] &&
         beer.average_temperature === beers[0].average_temperature,
     );
   }

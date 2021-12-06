@@ -1,15 +1,16 @@
 import { Controller } from '@nestjs/common';
 import { BeerService } from './beer.service';
 import { MessagePattern } from '@nestjs/microservices';
-import { CreateBeerDto } from './dto/create-beer.dto';
+import { CreateBeerDTO } from './dto/create-beer.dto';
+import { FindByTemperatureDTO } from './dto/find-by-temperature.dto';
 
 @Controller('beers')
 export class BeerController {
   constructor(private readonly beerService: BeerService) {}
 
   @MessagePattern('create')
-  async create(createBeerDto: CreateBeerDto) {
-    return this.beerService.create(createBeerDto);
+  async create(createBeerDTO: CreateBeerDTO) {
+    return this.beerService.create(createBeerDTO);
   }
 
   @MessagePattern('findAll')
@@ -23,8 +24,8 @@ export class BeerController {
   }
 
   @MessagePattern('findByTemperature')
-  findByTemperature(temperature) {
-    return this.beerService.findByTemperature(temperature);
+  findByTemperature(findByTemperatureDTO: FindByTemperatureDTO) {
+    return this.beerService.findByTemperature(findByTemperatureDTO);
   }
 
   //

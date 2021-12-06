@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -33,7 +34,10 @@ export class Beer {
   @Column({ nullable: false })
   style: BeerStyle;
 
-  @OneToOne(() => Playlist)
+  @OneToOne(() => Playlist, (playlist) => playlist.id, {
+    cascade: true,
+  })
+  @JoinColumn()
   playlist: Playlist;
 
   @CreateDateColumn({

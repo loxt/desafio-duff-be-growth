@@ -17,11 +17,7 @@ async function bootstrap() {
     },
   );
   app.useGlobalFilters(new RpcExceptionFilter());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-    }),
-  );
+  app.useGlobalPipes(new ValidationPipe());
 
   app.listen().then(() => {
     logger.log('Listening on port 8081');
